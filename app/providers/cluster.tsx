@@ -57,11 +57,11 @@ function parseQuery(searchParams: ReadonlyURLSearchParams | null): Cluster {
             return Cluster.Custom;
         case 'devnet':
             return Cluster.Devnet;
-        case 'mainnet-beta':
-            return Cluster.MainnetBeta;
         case 'testnet':
-        default:
             return Cluster.Testnet;
+        case 'mainnet':
+        default:
+            return Cluster.Mainnet;
     }
 }
 

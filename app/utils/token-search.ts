@@ -39,7 +39,7 @@ export async function searchTokens(search: string, cluster: Cluster): Promise<Se
 
     // See https://github.com/solflare-wallet/utl-sdk/blob/master/src/types.ts#L5
     let chainId: number;
-    if (cluster === Cluster.MainnetBeta) chainId = 101;
+    if (cluster === Cluster.Mainnet) chainId = 101;
     else if (cluster === Cluster.Testnet) chainId = 102;
     else if (cluster === Cluster.Devnet) chainId = 103;
     else {

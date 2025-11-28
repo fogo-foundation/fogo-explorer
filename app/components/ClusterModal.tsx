@@ -115,7 +115,7 @@ function ClusterToggle() {
 
                 const nextSearchParams = new URLSearchParams(searchParams?.toString());
                 const slug = clusterSlug(net);
-                if (slug === 'testnet') {
+                if (slug === 'mainnet') {
                     nextSearchParams.delete('cluster');
                 } else {
                     nextSearchParams.set('cluster', slug);

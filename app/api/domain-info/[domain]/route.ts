@@ -1,7 +1,7 @@
 import { Connection } from "@solana/web3.js";
 import { NextResponse } from "next/server";
 
-import { MAINNET_BETA_URL } from "@/app/utils/cluster";
+import { MAINNET_URL } from "@/app/utils/cluster";
 import { getANSDomainInfo,getDomainInfo } from "@/app/utils/domain-info";
 
 type Params = {
@@ -19,7 +19,7 @@ export async function GET(
     // Intentionally using legacy web3js for compatibility with bonfida library
     // This is an API route so won't affect client bundle
     // We only fetch domains on mainnet
-    const connection = new Connection(MAINNET_BETA_URL);
+    const connection = new Connection(MAINNET_URL);
     const domainInfo = await (domain.substring(domain.length - 4) === '.sol' ? getDomainInfo(domain, connection) : getANSDomainInfo(domain, connection));
 
     return NextResponse.json(domainInfo, {

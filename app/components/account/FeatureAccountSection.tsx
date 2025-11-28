@@ -148,7 +148,7 @@ function ClusterActivationEpochAtCluster({ featureInfo, cluster }: { featureInfo
 
     return (
         <>
-            {mainnetActivationEpoch && cluster === Cluster.MainnetBeta && (
+            {mainnetActivationEpoch && cluster === Cluster.Mainnet && (
                 <div>
                     <Link href={`/epoch/${featureInfo.mainnetActivationEpoch}?cluster=mainnet`} className="epoch-link">
                         Mainnet Epoch {featureInfo.mainnetActivationEpoch}
@@ -183,7 +183,7 @@ function FeatureActivatedAtCluster({ featureInfo, cluster }: { featureInfo: Feat
 
     return (
         <>
-            {cluster === Cluster.MainnetBeta && mainnetActivationEpoch && (
+            {cluster === Cluster.Mainnet && mainnetActivationEpoch && (
                 <span className="badge bg-success">Active on Mainnet</span>
             )}
             {cluster === Cluster.Devnet && devnetActivationEpoch && (
