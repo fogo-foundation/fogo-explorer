@@ -1,7 +1,3 @@
-<p align="center">
-    <img alt="Fogo" src="https://i.imgur.com/IKyzQ6T.png" width="250" />
-</p>
-
 # Fogo Explorer
 
 The Fogo Explorer is a web application that allows users to explore the Fogo blockchain. It provides a user-friendly interface to view transactions, accounts, blocks, and other on-chain data. The Explorer supports various protocol integrations, allowing users to inspect and understand different types of transactions and instructions on the Fogo network.
