@@ -39,7 +39,7 @@ async function mockFileResponseOnce(data: any, headers: Headers) {
     fetch.mockResolvedValueOnce({ headers, json: async () => data });
 }
 
-const ORIGIN = 'http://explorer.solana.com';
+const ORIGIN = 'http://explorer.fogo.io';
 
 function requestFactory(uri?: string) {
     const params = new URLSearchParams({ uri: uri ?? '' });

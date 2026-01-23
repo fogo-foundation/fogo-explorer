@@ -42,4 +42,3 @@
 ## Additional Notes
 
 <!-- Add any other context about the PR here -->
-<!-- For Solana Verify (Verified Builds) related changes, note that bugs should be reported to disclosures@solana.org -->

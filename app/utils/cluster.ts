@@ -41,7 +41,7 @@ export function clusterName(cluster: Cluster): string {
 
 export const MAINNET_URL = 'https://mainnet.fogo.io';
 export const TESTNET_URL = 'https://testnet.fogo.io';
-export const DEVNET_URL = 'https://api.devnet.solana.com';
+export const DEVNET_URL = 'https://devnet.fogo.io';
 
 export function clusterUrl(cluster: Cluster, customUrl: string): string {
     const modifyUrl = (url: string): string => {

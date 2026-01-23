@@ -12,7 +12,6 @@ import AsyncSelect from 'react-select/async';
 
 import { FetchedDomainInfo } from '../api/domain-info/[domain]/route';
 import { LOADER_IDS, LoaderName, PROGRAM_INFO_BY_ID, SPECIAL_IDS, SYSVAR_IDS } from '../utils/programs';
-import { searchTokens } from '../utils/token-search';
 import { MIN_MESSAGE_LENGTH } from './inspector/RawInputCard';
 
 interface SearchOptions {
@@ -56,17 +55,10 @@ export function SearchBar() {
 
     async function performSearch(search: string): Promise<SearchOptions[]> {
         const localOptions = buildOptions(search, cluster, clusterInfo?.epochInfo.epoch);
-        let tokenOptions;
-        try {
-            tokenOptions = await buildTokenOptions(search, cluster);
-        } catch (e) {
-            console.error(`Failed to build token options for search: ${e instanceof Error ? e.message : e}`);
-        }
-        const tokenOptionsAppendable = tokenOptions ? [tokenOptions] : [];
         const domainOptions =
             hasDomainSyntax(search) && cluster === Cluster.Mainnet ? (await buildDomainOptions(search)) ?? [] : [];
 
-        return [...localOptions, ...tokenOptionsAppendable, ...domainOptions];
+        return [...localOptions, ...domainOptions];
     }
 
     const resetValue = '' as any;
@@ -83,7 +75,7 @@ export function SearchBar() {
                         ref={selectRef}
                         noOptionsMessage={() => 'No Results'}
                         loadingMessage={() => 'loading...'}
-                        placeholder="Search for blocks, accounts, transactions, programs, and tokens"
+                        placeholder="Search for blocks, accounts, transactions, and programs"
                         value={resetValue}
                         inputValue={search}
                         blurInputOnSelect
@@ -178,17 +170,6 @@ function buildSpecialOptions(search: string) {
                 pathname: '/address/' + id,
                 value: [name, id],
             })),
-        };
-    }
-}
-
-async function buildTokenOptions(search: string, cluster: Cluster): Promise<SearchOptions | undefined> {
-    const matchedTokens = await searchTokens(search, cluster);
-
-    if (matchedTokens.length > 0) {
-        return {
-            label: 'Tokens',
-            options: matchedTokens,
         };
     }
 }
