@@ -7,7 +7,7 @@ import { checkURLForPrivateIP, isHTTPProtocol } from './feature/ip';
 
 type Params = { params: object }
 
-const USER_AGENT = process.env.NEXT_PUBLIC_METADATA_USER_AGENT ?? 'Solana Explorer';
+const USER_AGENT = process.env.NEXT_PUBLIC_METADATA_USER_AGENT ?? 'Fogo Explorer';
 const MAX_SIZE = process.env.NEXT_PUBLIC_METADATA_MAX_CONTENT_SIZE
     ? Number(process.env.NEXT_PUBLIC_METADATA_MAX_CONTENT_SIZE)
     : 1_000_000; // 1 000 000 bytes
@@ -62,7 +62,7 @@ export async function GET(
     }
 
     const headers = new Headers({
-        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': '*/*',
         'User-Agent': USER_AGENT
     });
 
@@ -89,17 +89,11 @@ export async function GET(
     }
 
     // preserve original cache-control headers
-    const contentLength = resourceHeaders.get('content-length');
     const responseHeaders: Record<string, string> = {
         'Cache-Control': resourceHeaders.get('cache-control') ?? 'no-cache',
         'Content-Type': resourceHeaders.get('content-type') ?? 'application/json; charset=utf-8',
         Etag: resourceHeaders.get('etag') ?? 'no-etag',
     };
-
-    // Only set Content-Length if it exists in the original response
-    if (contentLength) {
-        responseHeaders['Content-Length'] = contentLength;
-    }
 
     // Validate that all required headers are present
     const hasMissingHeaders = Object.values(responseHeaders).some(value => value == null);
@@ -107,12 +101,18 @@ export async function GET(
         return respondWithError(400);
     }
 
+    const contentType = resourceHeaders.get('content-type') ?? '';
+
     if (data instanceof ArrayBuffer) {
         return new NextResponse(data, {
             headers: responseHeaders,
         });
-    } else if (resourceHeaders.get('content-type')?.startsWith('application/json')) {
+    } else if (contentType.includes('application/json')) {
         return NextResponse.json(data, {
+            headers: responseHeaders,
+        });
+    } else if (contentType.includes('text/') && typeof data === 'string') {
+        return new NextResponse(data, {
             headers: responseHeaders,
         });
     } else {

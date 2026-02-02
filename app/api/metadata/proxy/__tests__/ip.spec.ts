@@ -95,7 +95,7 @@ describe('ip::checkURLForPrivateIP with single resolved address', () => {
 
     test('should handle single address positively', async () => {
         mockLookupOnce({ address: '76.76.21.21' });
-        await expect(checkURLForPrivateIP('http://solana.com')).resolves.toBe(false);
+        await expect(checkURLForPrivateIP('http://fogo.io')).resolves.toBe(false);
     });
 });
 

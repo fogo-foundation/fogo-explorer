@@ -50,13 +50,33 @@ async function fetch(dispatch: Dispatch, cluster: Cluster, url: string) {
     try {
         const rpc = createSolanaRpc(url);
 
+        // Get total supply from RPC
         const supplyResponse = await rpc
             .getSupply({ commitment: 'finalized', excludeNonCirculatingAccountsList: true })
             .send();
+        const total = supplyResponse.value.total;
+
+        // Get circulating supply from Fogo API via proxy (returns FOGO amount, need to convert to lamports)
+        let circulating: bigint;
+        try {
+            const proxyUrl = `/api/metadata/proxy?uri=${encodeURIComponent(
+                'https://api.fogo.io/api/cmc/supply?q=circulatingSupply'
+            )}`;
+            const circulatingResponse = await window.fetch(proxyUrl);
+            const circulatingFogo = await circulatingResponse.text();
+            // Convert FOGO to lamports (1 FOGO = 10^9 lamports)
+            circulating = BigInt(Math.floor(parseFloat(circulatingFogo) * 1_000_000_000));
+        } catch {
+            // Fall back to RPC value if API fails
+            circulating = supplyResponse.value.circulating;
+        }
+
+        const nonCirculating = total - circulating;
+
         const supply: Supply = {
-            circulating: supplyResponse.value.circulating,
-            nonCirculating: supplyResponse.value.nonCirculating,
-            total: supplyResponse.value.total,
+            circulating,
+            nonCirculating,
+            total,
         };
 
         // Update state if still connecting

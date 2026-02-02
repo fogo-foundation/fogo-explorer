@@ -18,7 +18,7 @@ import {
 } from '@validators/accounts/upgradeable-program';
 import Link from 'next/link';
 import React from 'react';
-import { ExternalLink, RefreshCw } from 'react-feather';
+import { RefreshCw } from 'react-feather';
 
 import { useSquadsMultisigLookup } from '@/app/providers/squadsMultisig';
 import { Cluster } from '@/app/utils/cluster';
@@ -175,10 +175,7 @@ function MultisigBadge({ pubkey }: { pubkey: PublicKey }) {
 function SecurityLabel() {
     return (
         <InfoTooltip text="Security.txt helps security researchers to contact developers if they find security bugs.">
-            <Link rel="noopener noreferrer" target="_blank" href="https://github.com/neodyme-labs/solana-security-txt">
-                <span className="security-txt-link-color-hack-reee">Security.txt</span>
-                <ExternalLink className="align-text-top ms-2" size={13} />
-            </Link>
+            <span className="security-txt-link-color-hack-reee">Security.txt</span>
         </InfoTooltip>
     );
 }
@@ -186,14 +183,7 @@ function SecurityLabel() {
 function VerifiedLabel() {
     return (
         <InfoTooltip text="Verified builds allow users can ensure that the hash of the on-chain program matches the hash of the program of the given codebase (registry hosted by osec.io).">
-            <Link
-                rel="noopener noreferrer"
-                target="_blank"
-                href="https://github.com/Ellipsis-Labs/solana-verifiable-build"
-            >
-                <span className="security-txt-link-color-hack-reee">Verified Build</span>
-                <ExternalLink className="align-text-top ms-2" size={13} />
-            </Link>
+            <span className="security-txt-link-color-hack-reee">Verified Build</span>
         </InfoTooltip>
     );
 }

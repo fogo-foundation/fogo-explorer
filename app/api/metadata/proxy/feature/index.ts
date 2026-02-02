@@ -1,7 +1,7 @@
 import { default as fetch, Headers } from 'node-fetch';
 
 import { errors, matchAbortError, matchMaxSizeError, matchTimeoutError, StatusError, unsupportedMediaError } from './errors';
-import { processBinary, processJson } from './processors';
+import { processBinary, processJson, processText } from './processors';
 
 export { StatusError };
 
@@ -57,12 +57,13 @@ export async function fetchResource(
     headers: Headers,
     timeout: number,
     size: number
-): Promise<Awaited<|
-    ReturnType<typeof processBinary> | 
-    ReturnType<typeof processJson>
+): Promise<Awaited<
+    | ReturnType<typeof processBinary>
+    | ReturnType<typeof processJson>
+    | ReturnType<typeof processText>
 >> {
     const [error, response] = await requestResource(uri, headers, timeout, size);
-    
+
     // check for response to infer proper type for it
     // and throw proper error
     if (error || !response) {
@@ -70,13 +71,13 @@ export async function fetchResource(
     }
 
     // guess how to process resource by content-type
-    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const contentType = response.headers.get('content-type') ?? '';
 
-    const isImage = response.headers.get('content-type')?.includes('image/');
+    if (contentType.includes('application/json')) return processJson(response);
 
-    if (isJson) return processJson(response);
+    if (contentType.includes('image/')) return processBinary(response);
 
-    if (isImage) return processBinary(response);
+    if (contentType.includes('text/')) return processText(response);
 
     // otherwise we throw error as we getting unexpected content
     throw unsupportedMediaError;

@@ -49,3 +49,23 @@ export async function processJson(data: fetch.Response){
         }
     }
 }
+
+/**
+ * process plain text data
+ */
+export async function processText(data: fetch.Response){
+    const headers = data.headers;
+
+    try{
+        const text = await data.text();
+
+        return { data: text, headers };
+    } catch(error) {
+        if (matchMaxSizeError(error)) {
+            throw errors[413];
+        } else {
+            console.debug(error);
+            throw errors[500];
+        }
+    }
+}

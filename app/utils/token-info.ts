@@ -4,39 +4,33 @@ import { ChainId, Client, Token, UtlConfig } from '@solflare-wallet/utl-sdk';
 import { Cluster } from './cluster';
 
 type TokenExtensions = {
-    readonly website?: string;
-    readonly bridgeContract?: string;
-    readonly assetContract?: string;
     readonly address?: string;
+    readonly assetContract?: string;
+    readonly bridgeContract?: string;
+    readonly coingeckoId?: string;
+    readonly description?: string;
+    readonly discord?: string;
     readonly explorer?: string;
-    readonly twitter?: string;
     readonly github?: string;
+    readonly imageUrl?: string;
     readonly medium?: string;
     readonly tgann?: string;
     readonly tggroup?: string;
-    readonly discord?: string;
-    readonly serumV3Usdt?: string;
-    readonly serumV3Usdc?: string;
-    readonly coingeckoId?: string;
-    readonly imageUrl?: string;
-    readonly description?: string;
+    readonly twitter?: string;
+    readonly website?: string;
 };
 export type FullLegacyTokenInfo = {
-    readonly chainId: number;
     readonly address: string;
-    readonly name: string;
+    readonly chainId: number;
     readonly decimals: number;
-    readonly symbol: string;
-    readonly logoURI?: string;
-    readonly tags?: string[];
     readonly extensions?: TokenExtensions;
+    readonly logoURI?: string;
+    readonly name: string;
+    readonly symbol: string;
+    readonly tags?: string[];
 };
 export type FullTokenInfo = FullLegacyTokenInfo & {
     readonly verified: boolean;
-};
-
-type FullLegacyTokenInfoList = {
-    tokens: FullLegacyTokenInfo[];
 };
 
 function getChainId(cluster: Cluster): ChainId | undefined {
@@ -73,25 +67,8 @@ export async function getTokenInfo(
     return token;
 }
 
-async function getFullLegacyTokenInfoUsingCdn(
-    address: PublicKey,
-    chainId: ChainId
-): Promise<FullLegacyTokenInfo | undefined> {
-    const tokenListResponse = await fetch(
-        'https://cdn.jsdelivr.net/gh/solana-labs/token-list@latest/src/tokens/solana.tokenlist.json'
-    );
-    if (tokenListResponse.status >= 400) {
-        console.error(new Error('Error fetching token list from CDN'));
-        return undefined;
-    }
-    const { tokens } = (await tokenListResponse.json()) as FullLegacyTokenInfoList;
-    const tokenInfo = tokens.find(t => t.address === address.toString() && t.chainId === chainId);
-    return tokenInfo;
-}
-
 /**
- * Get the full token info from a CDN with the legacy token list
- * The UTL SDK only returns the most common fields, we sometimes need eg extensions
+ * Get the full token info using on-chain Metaplex data
  * @param address Public key of the token
  * @param cluster Cluster to fetch the token info for
  */
@@ -103,30 +80,19 @@ export async function getFullTokenInfo(
     const chainId = getChainId(cluster);
     if (!chainId) return undefined;
 
-    const [legacyCdnTokenInfo, sdkTokenInfo] = await Promise.all([
-        getFullLegacyTokenInfoUsingCdn(address, chainId),
-        getTokenInfo(address, cluster, connectionString),
-    ]);
+    const sdkTokenInfo = await getTokenInfo(address, cluster, connectionString);
 
     if (!sdkTokenInfo) {
-        return legacyCdnTokenInfo
-            ? {
-                  ...legacyCdnTokenInfo,
-                  verified: true,
-              }
-            : undefined;
+        return undefined;
     }
 
-    // Merge the fields, prioritising the sdk ones which are more up to date
     let tags: string[] = [];
     if (sdkTokenInfo.tags) tags = Array.from(sdkTokenInfo.tags);
-    else if (legacyCdnTokenInfo?.tags) tags = legacyCdnTokenInfo.tags;
 
     return {
         address: sdkTokenInfo.address,
         chainId,
         decimals: sdkTokenInfo.decimals ?? 0,
-        extensions: legacyCdnTokenInfo?.extensions,
         logoURI: sdkTokenInfo.logoURI ?? undefined,
         name: sdkTokenInfo.name,
         symbol: sdkTokenInfo.symbol,
